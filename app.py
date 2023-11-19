@@ -1,5 +1,6 @@
 import io
 import time
+import csv
 from fastapi.responses import FileResponse
 from fastapi import (
     FastAPI, 
@@ -15,10 +16,22 @@ from PIL import Image
 from predictor import PoseDetector
 from mediapipe.framework.formats import landmark_pb2
 from mediapipe import solutions
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Pose classification API")
 
+# Permitimos el uso de CORS para el frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Replace with the actual URL of your React app
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 pose_detector = PoseDetector()
+
+# Lista donde se almacenran los datos de cada request de /poses
+execution_logs = []
 
 def get_pose_detector():
     return pose_detector
@@ -51,7 +64,7 @@ def get_status():
             "message": "Pose classification API is running",
             "model": "Pose classification model",
             "version": "1.0.0",
-            "author": "Camila Grandy Camacho y Ariene Garrett Becerra",
+            "author": "Camila Grandy Camacho y Ariane Garrett Becerra",
             }
 
 @app.post("/poses")
@@ -83,29 +96,61 @@ def detect_poses(
     image_stream = io.BytesIO()
     img_pil.save(image_stream, format="JPEG")
     image_stream.seek(0)
+
+    # Guardamos los datos del request
+    execution_log = {
+        "date": time.ctime(), # Fecha y hora en la que se realizo el request
+        "filename": str(file.filename), # Nombre del archivo
+        "execution_time": str(execution_time), # Tiempo de ejecucion
+        "image_size": str(img.size), # Tamaño de la imagen
+        "content_type": str(file.content_type), # Formato de la imagen
+        "model": "pose_landmarker_lite.task" # Modelo utilizado
+        # Añadir prediccion
+    }
+    execution_logs.append(execution_log)
     
     headers = {
+        # Muestra las landmarks predichas en la imagen
         "pose_landmarks_list": str(pose_landmarks_list),
-        # Muestra el tiempo de ejecución de la solicitud.
+        # Muestra el tiempo de ejecución de la solicitud
         "execution_time": str(execution_time),
         # Muestra el tamaño de la imagen 
         "image_size": str(img.size),
-        # Muestra el formato de la imagen, que puede ser JPEG, PNG, etc.
+        # Muestra el formato de la imagen, que puede ser JPEG, PNG, etc
         "shape": str(img.shape),
-        # Muestra el tipo de datos de la imagen, que puede ser uint8, int32, etc.
+        # Muestra el tipo de datos de la imagen, que puede ser uint8, int32, etc
         "dtype": str(img.dtype),
-        # Muestra la fecha y hora en que se realizó la solicitud.
+        # Muestra la fecha y hora en que se realizó la solicitud
         "date": str(time.ctime()),
-        # Muestra el nombre del archivo de imagen.
+        # Muestra el nombre del archivo de imagen
         "filename": str(file.filename),
-        # Muestra el formato de la imagen, que puede ser JPEG, PNG, etc.
-        "content_type": str(file.content_type),
-        
+        # Muestra el formato de la imagen, que puede ser JPEG, PNG, etc
+        "content_type": str(file.content_type),  
     }
         
+    return Response(content=image_stream.read(), media_type="image/jpeg", status_code=200, headers=headers)
 
-    return Response(content=image_stream.read(), media_type="image/jpeg",
-                    status_code=200, headers=headers)
+@app.get("/reports")
+def generate_report():
+    # Generar el reporte en formato CSV
+    if not execution_logs:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Por el momento no existen reportes!"
+        )
+
+    # Definimos el nombre del archivo CSV
+    csv_file_path = "poses_report.csv"
+
+    # Añadimos los execution_logs al archivo a generar
+    with open(csv_file_path, mode="w", newline="") as csv_file:
+        fieldnames = execution_logs[0].keys()
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(execution_logs)
+
+    # Devolvemos el archivo generado
+    return FileResponse(csv_file_path, filename="poses_report.csv", media_type="text/csv")
 
 if __name__ == "__main__":
     import uvicorn

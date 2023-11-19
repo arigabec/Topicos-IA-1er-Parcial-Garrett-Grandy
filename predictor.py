@@ -23,8 +23,8 @@ class PoseDetector:
         # Convertir array de numpy a formato compatible
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image_array)
         detection = self.model.detect(mp_image)
-        #lo que hace es detectar la pose y devolver un objeto con los landmarks
-        #para demostrar la confianza de la deteccion
+        # Lo que hace es detectar la pose y devolver un objeto con los landmarks
+        # para demostrar la confianza de la deteccion
         results = detection.pose_landmarks
         
         return detection
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     img = cv2.cvtColor(cv2.imread(image), cv2.COLOR_BGR2RGB)
     predictor = PoseDetector()
     prediction = predictor.predict_image(img)
-    #mostrar el directorio del modelo
+    # Mostrar el directorio del modelo
     print(dir(prediction))
     print(prediction.__dataclass_params__)
     print(prediction.__annotations__)
