@@ -8,7 +8,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import matplotlib.pyplot as plt
 
-POSE_MODEL_PATH = "1erParcial/pose_landmarker_lite.task"
+POSE_MODEL_PATH = "pose_landmarker_lite.task"
 
 class PoseDetector:
     def __init__(self, model_path=POSE_MODEL_PATH):
@@ -36,7 +36,7 @@ class PoseDetector:
 
 
 if __name__ == "__main__":
-    image = "1erParcial/person.jpg"
+    image = "person.jpg"
     img = cv2.cvtColor(cv2.imread(image), cv2.COLOR_BGR2RGB)
     predictor = PoseDetector()
     prediction = predictor.predict_image(img)
