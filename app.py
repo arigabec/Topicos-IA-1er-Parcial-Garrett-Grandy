@@ -86,8 +86,9 @@ def detect_poses(
     
     headers = {
         "pose_landmarks_list": str(pose_landmarks_list),
+        # Muestra el tiempo de ejecución de la solicitud.
         "execution_time": str(execution_time),
-        # Muestra información sobre el uso de recursos durante la ejecución, como la cantidad de memoria RAM utilizada o el porcentaje de CPU/GPU utilizado.
+        # Muestra el tamaño de la imagen 
         "image_size": str(img.size),
         # Muestra el formato de la imagen, que puede ser JPEG, PNG, etc.
         "shape": str(img.shape),
