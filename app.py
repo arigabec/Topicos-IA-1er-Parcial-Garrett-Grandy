@@ -130,6 +130,7 @@ def detect_poses(
         
     return Response(content=image_stream.read(), media_type="image/jpeg", status_code=200, headers=headers)
 
+
 @app.get("/reports")
 def generate_report():
     # Generar el reporte en formato CSV

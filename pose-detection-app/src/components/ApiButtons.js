@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
+import { Button, Grid, Container, Typography } from '@mui/material';
 
 const ApiButtons = ({ setApiResponse }) => {
-
   const [selectedFile, setSelectedFile] = useState(null);
   const [prediction, setPrediction] = useState(false);
   const [resultImage, setResultImage] = useState(null);
@@ -43,6 +43,8 @@ const ApiButtons = ({ setApiResponse }) => {
 
       setResultImage(imageUrl);
       setApiResponse(response.headers);
+      console.log(response);
+
     } catch (error) {
       console.error('Error calling /poses:', error);
     }
@@ -73,20 +75,50 @@ const ApiButtons = ({ setApiResponse }) => {
   };
 
   return (
-    <div>
-      <button onClick={handleStatusButtonClick}>Show API status</button>
-      <button onClick={openModal}>Predict Pose</button>
-      {prediction && (
-        <div>
-          <input type="file" onChange={handleFileChange} />
-          <button onClick={handlePosesButtonClick}>Submit</button>
-        </div>
-      )}
-      <button onClick={handleReportsButtonClick}>Get report</button>
+    <Container sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: '5rem',
 
-      {resultImage && <img src={resultImage} alt="Pose result" />}
-    </div>
-  );
+    }}>
+      <Typography variant="h1" component="h1" gutterBottom>
+        Pose Detection App
+      </Typography>
+      <Grid container spacing={30} direction="row" alignItems="center">
+        <Grid item>
+          <Button variant="contained" onClick={handleStatusButtonClick}>
+            Show API status
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={openModal}>
+            Predict Pose
+          </Button>
+          {prediction && (
+            <div>
+              <input type="file" onChange={handleFileChange} />
+              <Button variant="contained" onClick={handlePosesButtonClick}>
+                Submit
+              </Button>
+            </div>
+          )}
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={handleReportsButtonClick}>
+            Get report
+          </Button>
+        </Grid>
+      </Grid>
+  
+      {resultImage && (
+        <Grid container item justifyContent="center">
+          <img src={resultImage} alt="Pose result" />
+        </Grid>
+      )}
+    </Container>
+  );  
 };
 
 export default ApiButtons;
