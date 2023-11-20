@@ -35,14 +35,12 @@ const ApiButtons = ({ setApiResponse }) => {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
-        responseType: 'blob'
+        responseType: 'json'
       });
 
-      // Creamos una url para poder visualizar la imagen
-      const imageUrl = URL.createObjectURL(new Blob([response.data]));
 
-      setResultImage(imageUrl);
-      setApiResponse(response.headers);
+      setResultImage(`data:image/jpeg;base64,${response.data.image}`);
+      setApiResponse(response.data.headers);
       console.log(response);
 
     } catch (error) {

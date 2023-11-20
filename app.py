@@ -1,7 +1,8 @@
 import io
 import time
 import csv
-from fastapi.responses import FileResponse
+import base64
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi import (
     FastAPI, 
     UploadFile, 
@@ -71,7 +72,7 @@ def get_status():
 def detect_poses(
     file: UploadFile = File(...), 
     predictor: PoseDetector = Depends(get_pose_detector)
-) -> Response:
+) -> JSONResponse:
     results, img, execution_time = predict_uploadfile(predictor, file)
 
     pose_landmarks_list = results.pose_landmarks
@@ -96,19 +97,9 @@ def detect_poses(
     image_stream = io.BytesIO()
     img_pil.save(image_stream, format="JPEG")
     image_stream.seek(0)
+    img_base64 = base64.b64encode(image_stream.read()).decode('utf-8')
 
     # Guardamos los datos del request
-    execution_log = {
-        "date": time.ctime(), # Fecha y hora en la que se realizo el request
-        "filename": str(file.filename), # Nombre del archivo
-        "execution_time": str(execution_time), # Tiempo de ejecucion
-        "image_size": str(img.size), # Tamaño de la imagen
-        "content_type": str(file.content_type), # Formato de la imagen
-        "model": "pose_landmarker_lite.task" # Modelo utilizado
-        # Añadir prediccion
-    }
-    execution_logs.append(execution_log)
-    
     headers = {
         # Muestra las landmarks predichas en la imagen
         "pose_landmarks_list": str(pose_landmarks_list),
@@ -127,9 +118,9 @@ def detect_poses(
         # Muestra el formato de la imagen, que puede ser JPEG, PNG, etc
         "content_type": str(file.content_type),  
     }
+    execution_logs.append(headers)
         
-    return Response(content=image_stream.read(), media_type="image/jpeg", status_code=200, headers=headers)
-
+    return JSONResponse(content={"image": img_base64, "headers": headers}, status_code=200)
 
 @app.get("/reports")
 def generate_report():
