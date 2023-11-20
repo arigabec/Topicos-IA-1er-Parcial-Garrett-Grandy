@@ -63,7 +63,9 @@ def predict_uploadfile(predictor, file):
 def get_status():
     return {"status": "ok",
             "message": "Pose classification API is running",
-            "model": "Pose classification model",
+            "model": "Pose Landmarker utiliza una serie de modelos para predecir puntos de referencia de pose. El primer modelo detecta la presencia de cuerpos humanos dentro de un marco de imagen y el segundo modelo localiza puntos de referencia en los cuerpos."
+            "En este caso se utiliza el Pose landmarker model que agrega un mapeo completo de la pose. El modelo genera una estimación de 33 puntos de referencia de pose tridimensionales.",
+            "service": "Pose classification API es un servicio que permite detectar poses en imágenes.",
             "version": "1.0.0",
             "author": "Camila Grandy Camacho y Ariane Garrett Becerra",
             }
