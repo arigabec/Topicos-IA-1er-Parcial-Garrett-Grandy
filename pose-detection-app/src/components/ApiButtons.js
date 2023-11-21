@@ -18,7 +18,7 @@ const ApiButtons = () => {
   const openModal = () => {
     setPrediction(true);
     setShowTablePoses(true);
-    setShowTable(false); // Ocultar la tabla al hacer clic en "Predict Pose"
+    setShowTable(false); // Ocultar la tabla 
   };
 
   const handleStatusButtonClick = async () => {
@@ -26,11 +26,11 @@ const ApiButtons = () => {
     try {
       const response = await axios.get('http://127.0.0.1:8000/status');
       setApiResponse(response.data);
-      setShowTable(true); // Mostrar la tabla cuando se recibe una respuesta
-      setResultImage(null); // Limpiar la imagen
+      setShowTable(true); // Mostrar la tabla 
+      setResultImage(null); 
     } catch (error) {
       console.error('Error calling /status:', error);
-      setShowTable(false); // Ocultar la tabla en caso de error
+      setShowTable(false); // Ocultar la tabla 
     }
   };
 
@@ -39,7 +39,7 @@ const ApiButtons = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      // Limpiar los datos de la solicitud de estado y de la predicción
+      // Limpia los datos de la solicitud del estado y de la predicción
       setApiResponse(null);
       setApiResponsePost(null);
 
@@ -53,10 +53,9 @@ const ApiButtons = () => {
 
       setResultImage(`data:image/jpeg;base64,${response.data.image}`);
       setApiResponsePost(response.data.headers);
-      // setShowTable(true);
     } catch (error) {
       console.error('Error calling /poses:', error);
-      setShowTable(false); // Ocultar la tabla en caso de error
+      setShowTable(false); 
     }
   };
 
@@ -79,7 +78,7 @@ const ApiButtons = () => {
       // Removemos los datos de modo que nos servirán para otra petición
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
-      setShowTable(false); // Ocultar la tabla cuando se realiza otra acción
+      setShowTable(false); // Ocultar la tabla
       setShowTablePoses(false);
     } catch (error) {
       console.error('Error fetching report:', error);
@@ -130,7 +129,6 @@ const ApiButtons = () => {
       )}
       {showTable && (
         <div>
-          {/* Tabla para /STATUS */}
           <TableContainer component={Paper} elevation={3} style={{ marginTop: '20px' }}>
             <Typography variant="h2" component="h2" gutterBottom sx={{ /* Estilos */ }}>
               API /STATUS
@@ -158,7 +156,6 @@ const ApiButtons = () => {
 
       { showTablePoses && (
         <div>
-        {/* Tabla para /POSES */}
         <TableContainer component={Paper} elevation={3} style={{ marginTop: '20px' }}>
           <Typography variant="h2" component="h2" gutterBottom sx={{ /* Estilos */ }}>
             API /POSES
