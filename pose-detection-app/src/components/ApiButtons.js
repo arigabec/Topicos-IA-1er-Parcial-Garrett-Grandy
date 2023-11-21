@@ -8,18 +8,21 @@ const ApiButtons = () => {
   const [resultImage, setResultImage] = useState(null);
   const [apiResponse, setApiResponse] = useState(null);
   const [showTable, setShowTable] = useState(false);
+  const [showTablePoses, setShowTablePoses] = useState(false);
   const [apiResponsePost, setApiResponsePost] = useState(null);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
-
+  
   const openModal = () => {
     setPrediction(true);
+    setShowTablePoses(true);
     setShowTable(false); // Ocultar la tabla al hacer clic en "Predict Pose"
   };
 
   const handleStatusButtonClick = async () => {
+    setShowTablePoses(false);
     try {
       const response = await axios.get('http://127.0.0.1:8000/status');
       setApiResponse(response.data);
@@ -50,7 +53,7 @@ const ApiButtons = () => {
 
       setResultImage(`data:image/jpeg;base64,${response.data.image}`);
       setApiResponsePost(response.data.headers);
-      setShowTable(true);
+      // setShowTable(true);
     } catch (error) {
       console.error('Error calling /poses:', error);
       setShowTable(false); // Ocultar la tabla en caso de error
@@ -77,6 +80,7 @@ const ApiButtons = () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
       setShowTable(false); // Ocultar la tabla cuando se realiza otra acción
+      setShowTablePoses(false);
     } catch (error) {
       console.error('Error fetching report:', error);
     }
@@ -149,30 +153,34 @@ const ApiButtons = () => {
               </TableBody>
             </Table>
           </TableContainer>
+        </div>
+      )}
 
-          {/* Tabla para /POSES */}
-          <TableContainer component={Paper} elevation={3} style={{ marginTop: '20px' }}>
-            <Typography variant="h2" component="h2" gutterBottom sx={{ /* Estilos */ }}>
-              API /POSES
-            </Typography>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Property</TableCell>
-                  <TableCell>Value</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {apiResponsePost &&
-                  Object.entries(apiResponsePost).map(([property, value]) => (
-                    <TableRow key={property}>
-                      <TableCell>{property}</TableCell>
-                      <TableCell>{value}</TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+      { showTablePoses && (
+        <div>
+        {/* Tabla para /POSES */}
+        <TableContainer component={Paper} elevation={3} style={{ marginTop: '20px' }}>
+          <Typography variant="h2" component="h2" gutterBottom sx={{ /* Estilos */ }}>
+            API /POSES
+          </Typography>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Property</TableCell>
+                <TableCell>Value</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {apiResponsePost &&
+                Object.entries(apiResponsePost).map(([property, value]) => (
+                  <TableRow key={property}>
+                    <TableCell>{property}</TableCell>
+                    <TableCell>{value}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
         </div>
       )}
     </Container>

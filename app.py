@@ -59,6 +59,10 @@ def predict_uploadfile(predictor, file):
     
     return results, img_array, execution_time
 
+def predictPose(landmarks):
+    for i in range(len(landmarks)):
+        print(landmarks[i])
+
 @app.get("/status")
 def get_status():
     return {"status": "ok",
@@ -80,10 +84,12 @@ def detect_poses(
     pose_landmarks_list = results.pose_landmarks
     annotated_image = np.copy(img)
 
+    pose_landmarks_proto = []
+
     # Iterar las diferentes poses y reconocer
     for idx in range(len(pose_landmarks_list)):
         pose_landmarks = pose_landmarks_list[idx]
-        print(pose_landmarks)
+
         # Dibujar los landmarks de la pose
         pose_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
         pose_landmarks_proto.landmark.extend([
@@ -95,6 +101,8 @@ def detect_poses(
             solutions.pose.POSE_CONNECTIONS,
             solutions.drawing_styles.get_default_pose_landmarks_style())
     
+    prediction_pose = predictPose(pose_landmarks_proto.landmark)
+
     img_pil = Image.fromarray(annotated_image)
     image_stream = io.BytesIO()
     img_pil.save(image_stream, format="JPEG")
@@ -104,7 +112,7 @@ def detect_poses(
     # Guardamos los datos del request
     headers = {
         # Muestra las landmarks predichas en la imagen
-        "pose_landmarks_list": str(pose_landmarks_list),
+        "landmarks_found": str(pose_landmarks_proto.landmark),
         # Muestra el tiempo de ejecución de la solicitud
         "execution_time": str(execution_time),
         # Muestra el tamaño de la imagen 
