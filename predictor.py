@@ -24,10 +24,30 @@ class PoseDetector:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image_array)
         detection = self.model.detect(mp_image)
         # Lo que hace es detectar la pose y devolver un objeto con los landmarks
-        # para demostrar la confianza de la deteccion
+        # para demostrar la confianza de la detección
         results = detection.pose_landmarks
-        
-        return detection
+
+        # Clasificar la pose
+        pose_labels = self.classify_pose(results)
+
+        return detection, pose_labels
+
+    def classify_pose(self, pose_landmarks_list):
+        # Almacena las clasificaciones para cada conjunto de landmarks
+        classifications = []
+
+        for pose_landmarks in pose_landmarks_list:
+            # Aquí puedes definir tus propias reglas de clasificación
+            # Ejemplo: si el hombro derecho está más arriba que el hombro izquierdo, clasifícalo como "Derecha Levantada"
+            right_shoulder_y = pose_landmarks[mp.solutions.pose.PoseLandmark.RIGHT_SHOULDER.value].y
+            left_shoulder_y = pose_landmarks[mp.solutions.pose.PoseLandmark.LEFT_SHOULDER.value].y
+
+            if right_shoulder_y > left_shoulder_y:
+                classifications.append("Derecha Levantada")
+            else:
+                classifications.append("Izquierda Levantada")
+
+        return classifications
 
     def display_color_row(*imgs):
         for i, img in enumerate(imgs):
@@ -40,14 +60,11 @@ class PoseDetector:
 
 
 if __name__ == "__main__":
-    image = "person.jpg"
+    image = "derecha.jpeg"
     img = cv2.cvtColor(cv2.imread(image), cv2.COLOR_BGR2RGB)
     predictor = PoseDetector()
-    prediction = predictor.predict_image(img)
+    detection, pose_labels = predictor.predict_image(img)
     # Mostrar el directorio del modelo
-    print(dir(prediction))
-    print(prediction.__dataclass_params__)
-    print(prediction.__annotations__)
-    print(prediction.__format__)
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    print(prediction.__sizeof__)
+    print (detection)
+    print("Pose Labels:", pose_labels)
+
