@@ -118,7 +118,7 @@ const ApiButtons = () => {
         </Grid>
         <Grid item>
           <Button variant="contained" onClick={handleReportsButtonClick}>
-            Get report
+            Get Report
           </Button>
         </Grid>
       </Grid>

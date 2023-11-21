@@ -52,16 +52,12 @@ def predict_uploadfile(predictor, file):
     img_array = np.array(img_obj)
     
     # Realizar la predicción
-    results = predictor.predict_image(img_array)
+    results, pose_labels = predictor.predict_image(img_array)
     
     end_time = time.time()
     execution_time = end_time - start_time
     
-    return results, img_array, execution_time
-
-def predictPose(landmarks):
-    for i in range(len(landmarks)):
-        print(landmarks[i])
+    return results, img_array, execution_time, pose_labels
 
 @app.get("/status")
 def get_status():
@@ -79,7 +75,7 @@ def detect_poses(
     file: UploadFile = File(...), 
     predictor: PoseDetector = Depends(get_pose_detector)
 ) -> JSONResponse:
-    results, img, execution_time = predict_uploadfile(predictor, file)
+    results, img, execution_time, pose_labels = predict_uploadfile(predictor, file)
 
     pose_landmarks_list = results.pose_landmarks
     annotated_image = np.copy(img)
@@ -100,8 +96,6 @@ def detect_poses(
             pose_landmarks_proto,
             solutions.pose.POSE_CONNECTIONS,
             solutions.drawing_styles.get_default_pose_landmarks_style())
-    
-    prediction_pose = predictPose(pose_landmarks_proto.landmark)
 
     img_pil = Image.fromarray(annotated_image)
     image_stream = io.BytesIO()
@@ -113,6 +107,8 @@ def detect_poses(
     headers = {
         # Muestra las landmarks predichas en la imagen
         "landmarks_found": str(pose_landmarks_proto.landmark),
+        # Muestra la predicción de la pose (si la mano derecha o izquierda está levantada)
+        "pose_labels": pose_labels,
         # Muestra el tiempo de ejecución de la solicitud
         "execution_time": str(execution_time),
         # Muestra el tamaño de la imagen 

@@ -39,10 +39,10 @@ class PoseDetector:
         for pose_landmarks in pose_landmarks_list:
             # Aquí puedes definir tus propias reglas de clasificación
             # Ejemplo: si el hombro derecho está más arriba que el hombro izquierdo, clasifícalo como "Derecha Levantada"
-            right_shoulder_y = pose_landmarks[mp.solutions.pose.PoseLandmark.RIGHT_SHOULDER.value].y
-            left_shoulder_y = pose_landmarks[mp.solutions.pose.PoseLandmark.LEFT_SHOULDER.value].y
+            right_wrist_y = pose_landmarks[mp.solutions.pose.PoseLandmark.RIGHT_WRIST.value].y
+            left_wrist_y = pose_landmarks[mp.solutions.pose.PoseLandmark.LEFT_WRIST.value].y
 
-            if right_shoulder_y > left_shoulder_y:
+            if right_wrist_y > left_wrist_y:
                 classifications.append("Derecha Levantada")
             else:
                 classifications.append("Izquierda Levantada")
@@ -60,7 +60,7 @@ class PoseDetector:
 
 
 if __name__ == "__main__":
-    image = "derecha.jpeg"
+    image = "person1.jpeg"
     img = cv2.cvtColor(cv2.imread(image), cv2.COLOR_BGR2RGB)
     predictor = PoseDetector()
     detection, pose_labels = predictor.predict_image(img)
